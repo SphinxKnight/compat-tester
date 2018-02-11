@@ -1,0 +1,27 @@
+{
+  "name": "compat-tester",
+  "version": "0.1.0",
+  "description": "Diagnose the compatibility of a site regarding browsers and environments",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/SphinxKnight/compat-tester.git"
+  },
+  "keywords": [
+    "compatibility",
+    "static"
+  ],
+  "author": "Julien G",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/SphinxKnight/compat-tester/issues"
+  },
+  "homepage": "https://github.com/SphinxKnight/compat-tester#readme",
+  "dependencies": {
+    "htmlparser2": "^3.9.2",
+    "mdn-browser-compat-data": "0.0.22"
+  }
+}
