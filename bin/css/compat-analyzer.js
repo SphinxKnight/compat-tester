@@ -9,7 +9,14 @@ exports.analyzeString = function analyzeString(text, browserScope, callback){
         if(node.type === "Declaration"){
             if(node.property in bcd.css.properties){
                 Object.keys(browserScope).map((browser)=>{
-                    let versionAddedProp = bcd.css.properties[node.property].__compat.support[browser].version_added;
+                    const supportBrowser = bcd.css.properties[node.property].__compat.support[browser];
+                    let versionAddedProp ;
+                    if(Array.isArray(supportBrowser)){
+                        // E.g. CSS property with prefixes
+                        versionAddedProp = supportBrowser[0].version_added;
+                    } else {
+                        versionAddedProp = supportBrowser.version_added;
+                    }
                     if((!versionAddedProp) || (versionAddedProp !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedProp)) )){
                         if(!("properties" in report["css"])){
                             report["css"]["properties"]= {};
@@ -31,5 +38,3 @@ exports.analyzeString = function analyzeString(text, browserScope, callback){
     });
     callback(null,report);
 };
-
-

@@ -5,12 +5,12 @@ const semver = require("semver");
 const readline = require("readline");
 
 exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
-    var report = {"html":{}};
+    let report = {"html":{}};
     const rl = readline.createInterface({
         input: fs.createReadStream(fileName),
         crlfDelay: Infinity
     });
-    var numLine = 1;
+    let numLine = 1;
 
     const parser = new htmlParser.Parser({
         onopentag: function(name, attribs){
@@ -34,7 +34,7 @@ exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
                         });
                     }
                     Object.keys(attribs).map((attrib)=>{
-                        if(bcd.html.elements[name][attrib]){
+                        if(bcd.html.elements[name][attrib] && bcd.html.elements[name][attrib].__compat){
                             let versionAddedAttr = bcd.html.elements[name][attrib].__compat.support[browser].version_added;
                             if((!versionAddedAttr) || (versionAddedAttr !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAttr)) )){
                                 if(!(name in report["html"])){
