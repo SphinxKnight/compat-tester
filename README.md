@@ -52,18 +52,22 @@ For instance with the following `scope.json`
 `compat-tester` will report any detected feature that isn't available before Internet Explorer 8 and Firefox 34.
 ## Limitations - Wishlist
 The following features are currently missing :'(
+
 ### CSS
 (*current feature set: properties*)
 * Media-queries
 * Selectors
+
 ### JavaScript
 (*current feature set: nothing*)
 * Parsing JS and dealing with primary features like statements, operators
+
 ### Misc.
 * Resolving remote resources
 * Adding comments to locally disable warnings
 * An interactive CLI to easily create a `scope.json` file (something like "compat-tester --init")
 * Tests
+
 ### Integration
 * Addon for VSCode
 * Addon for SublimeText
