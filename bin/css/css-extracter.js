@@ -1,22 +1,33 @@
 const fs = require("fs");
 const htmlParser = require("htmlparser2");
 const readline = require("readline");
+const path = require("path");
 
 exports.analyzeFile = function analyzeFile(fileName,callback){
     const rl = readline.createInterface({
         input: fs.createReadStream(fileName),
         crlfDelay: Infinity
     });
+    let numLine = 1;
+    let numLineBlock = 1;
+    // An accumulator for each fragment to parse later
+    // Each fragment has: a fileName, a lineShift, a content
     let acc = [];
     let inStyle = false;
     let styleBlock = "";
     const parser = new htmlParser.Parser({
         onopentag: function(name, attribs){
             if(name === "style"){
+                numLineBlock = numLine;
                 inStyle = true;
             }
             if(name === "link" && attribs.rel === "stylesheet"){
-                acc.push(fs.readFileSync(attribs.href,"utf-8"));
+                let fragment = {
+                    "fileName": path.relative(path.dirname(fileName),path.resolve(path.dirname(fileName),attribs.href)),
+                    "lineShift": 0,
+                    "content": fs.readFileSync(attribs.href,"utf-8")
+                };
+                acc.push(fragment);
             }
         },
         ontext: function(text){
@@ -25,12 +36,16 @@ exports.analyzeFile = function analyzeFile(fileName,callback){
             }
         },
         onclosetag: function(name){
-            if(name === "style"){
-                acc.push(styleBlock);
+            if(name === "style" && styleBlock !==""){
+                let fragment = {
+                    "fileName": fileName,
+                    "lineShift": numLineBlock,
+                    "content": styleBlock
+                };
+                acc.push(fragment);
                 inStyle = false;
-                styleBlock = "";
-
             }
+            styleBlock = "";
         },
         onend: function(){
             callback(null, acc);
@@ -39,6 +54,7 @@ exports.analyzeFile = function analyzeFile(fileName,callback){
 
     rl.on("line", (line) => {
         parser.write(line);
+        numLine++;
     });
   
     rl.on("close",() =>{

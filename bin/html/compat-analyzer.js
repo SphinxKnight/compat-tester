@@ -21,7 +21,7 @@ exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
                         report.push({
                             "featureName":"<"+name+">",
                             "browser":browser,
-                            "filename":fileName,
+                            "fileName":fileName,
                             "line": numLine,
                             "column": 0,
                             "featureVersion":versionAddedElem
@@ -34,7 +34,7 @@ exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
                                 report.push({
                                     "featureName":"<"+name+"> - attr" + attrib,
                                     "browser":browser,
-                                    "filename":fileName,
+                                    "fileName":fileName,
                                     "line": numLine,
                                     "column": 0,
                                     "featureVersion":versionAddedAttr
