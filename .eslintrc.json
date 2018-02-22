@@ -13,9 +13,18 @@
             "error",
             4
         ],
+        "eqeqeq":[
+            "error"
+        ],
         "linebreak-style": [
             "error",
             "unix"
+        ],
+        "prefer-const":[
+            "error"
+        ],
+        "no-var":[
+            "error"
         ],
         "quotes": [
             "error",
@@ -24,6 +33,16 @@
         "semi": [
             "error",
             "always"
+        ],
+        "no-trailing-spaces":[
+            "error"
+        ],
+        "space-before-function-paren": [
+            "error",
+            "always"
+        ],
+        "space-infix-ops":[
+            "error"
         ]
     }
 }

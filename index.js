@@ -15,7 +15,7 @@ htmlAnalyzer.analyzeFile(process.argv[2], scope, (e, d) => {
         console.error(e);
         return false;
     }
-    let report = d;
+    const report = d;
     console.log("HTML Report:");
     // report =[ {"browser " / "filename" / "line" / "column" / "featureName" / "minVer"]
     report.sort(sortReport);
@@ -26,7 +26,7 @@ htmlAnalyzer.analyzeFile(process.argv[2], scope, (e, d) => {
 
 
 // Let's get the CSS inside the site
-// cssExtracter.analyzeFile outputs an array of CSS stylesheet codes 
+// cssExtracter.analyzeFile outputs an array of CSS stylesheet codes
 cssExtracter.analyzeFile(process.argv[2], (e, acc) => {
     acc.map((block) => {
         cssAnalyzer.analyzeString(block.content, scope, block.lineShift, block.fileName, (e, d) => {
@@ -34,7 +34,7 @@ cssExtracter.analyzeFile(process.argv[2], (e, acc) => {
                 console.error(e);
                 return false;
             }
-            let report = d;
+            const report = d;
             console.log("CSS Report:");
             report.sort(sortReport);
             report.map(printReportLine);
@@ -51,7 +51,7 @@ jsExtracter.analyzeFile(process.argv[2], (e, acc) => {
                 console.error(e);
                 return false;
             }
-            let report = d;
+            const report = d;
             console.log("JS Report:");
             report.sort(sortReport);
             report.map(printReportLine);
@@ -60,7 +60,7 @@ jsExtracter.analyzeFile(process.argv[2], (e, acc) => {
 });
 
 
-function sortReport(reportLineA, reportLineB){
+function sortReport (reportLineA, reportLineB){
     if(reportLineA.browser !== reportLineB.browser){
         return (reportLineA.browser).localeCompare(reportLineB.browser);
     }
@@ -75,6 +75,6 @@ function sortReport(reportLineA, reportLineB){
     }
 }
 
-function printReportLine(reportLine) {
+function printReportLine (reportLine) {
     console.log("\t\t" + reportLine.browser + " incompatible - @" + reportLine.fileName + "#L" + reportLine.line + " - " + reportLine.featureName + (reportLine.featureVersion ? (" - minVer: " + reportLine.featureVersion) : " not implemented"));
 }

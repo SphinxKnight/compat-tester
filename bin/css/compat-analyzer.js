@@ -2,8 +2,8 @@ const cssTree = require("css-tree");
 const bcd = require("mdn-browser-compat-data");
 const semver = require("semver");
 
-exports.analyzeString = function analyzeString(text, browserScope, lineShift = 0, fileName, callback){
-    let report = [];
+exports.analyzeString = function analyzeString (text, browserScope, lineShift = 0, fileName, callback){
+    const report = [];
     const ast = cssTree.parse(text,{positions:true});
     cssTree.walk(ast,(node) => {
         if(node.type === "Declaration"){
@@ -19,7 +19,7 @@ exports.analyzeString = function analyzeString(text, browserScope, lineShift = 0
                     }
                     if((!versionAddedProp) || (versionAddedProp !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedProp)) )){
                         report.push({
-                            "featureName": "Property: "+ node.property,
+                            "featureName": "Property: " + node.property,
                             "browser":browser,
                             "fileName":fileName,
                             "column": node.loc.start.column,

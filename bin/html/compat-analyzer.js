@@ -4,8 +4,8 @@ const fs = require("fs");
 const semver = require("semver");
 const readline = require("readline");
 
-exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
-    let report = [];
+exports.analyzeFile = function analyzeFile (fileName, browserScope, callback){
+    const report = [];
     const rl = readline.createInterface({
         input: fs.createReadStream(fileName),
         crlfDelay: Infinity
@@ -13,13 +13,13 @@ exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
     let numLine = 1;
 
     const parser = new htmlParser.Parser({
-        onopentag: function(name, attribs){
+        onopentag: function (name, attribs){
             if(bcd.html.elements[name]){
                 Object.keys(browserScope).map((browser)=>{
-                    let versionAddedElem = bcd.html.elements[name].__compat.support[browser].version_added;
+                    const versionAddedElem = bcd.html.elements[name].__compat.support[browser].version_added;
                     if((!versionAddedElem) || (versionAddedElem !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedElem)) )){
                         report.push({
-                            "featureName":"<"+name+">",
+                            "featureName":"<" + name + ">",
                             "browser":browser,
                             "fileName":fileName,
                             "line": numLine,
@@ -29,10 +29,10 @@ exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
                     }
                     Object.keys(attribs).map((attrib)=>{
                         if(bcd.html.elements[name][attrib] && bcd.html.elements[name][attrib].__compat){
-                            let versionAddedAttr = bcd.html.elements[name][attrib].__compat.support[browser].version_added;
+                            const versionAddedAttr = bcd.html.elements[name][attrib].__compat.support[browser].version_added;
                             if((!versionAddedAttr) || (versionAddedAttr !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAttr)) )){
                                 report.push({
-                                    "featureName":"<"+name+"> - attr" + attrib,
+                                    "featureName":"<" + name + "> - attr" + attrib,
                                     "browser":browser,
                                     "fileName":fileName,
                                     "line": numLine,
@@ -41,13 +41,13 @@ exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
                                 });
                             }
                         }
-              
+
                     });
                 });
-          
+
             }
         },
-        onend: function(){
+        onend: function (){
             callback(null,report);
         }
     },{decodeEntities: true});
@@ -57,7 +57,7 @@ exports.analyzeFile = function analyzeFile(fileName, browserScope, callback){
         parser.write(line);
         numLine++;
     });
-    
+
     rl.on("close",() =>{
         parser.end();
     });
