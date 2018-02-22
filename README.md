@@ -26,6 +26,7 @@ Thanks to them for doing the heavy work :)
     compat-tester # Scans index.html as root file and uses scope.json as defaults
     compat-tester mySite.html myScope.json
     compat-tester -html myPage.html myScope.json  # Only scans the HTML of myPage.html
+    compat-tester myScope.json -html myPage.html
     compat-tester -css myStyle.css myScope.json   # Only scans the CSS of myStyle.css
     compat-tester -js myScript.js myScope.json    # !Not implemented yet! Only scans myScript.js
 
@@ -45,11 +46,40 @@ The `scope.json` file is simply a JSON file where the keys are the identifiers o
 For instance with the following `scope.json`
 
     {
-        "ie":8,
-        "firefox":34
+        "ie":"8",
+        "firefox":"34"
     }
 
 `compat-tester` will report any detected feature that isn't available before Internet Explorer 8 and Firefox 34.
+
+## Examples
+Using an scope with IE "1" (not a typo ;)) and Firefox "8", the report might look like:
+
+    HTML Report:
+            firefox incompatible - @index.html#L21 - <link> - attrcrossorigin - minVer: 18
+            firefox incompatible - @index.html#L21 - <link> - attrintegrity not implemented
+            firefox incompatible - @index.html#L99 - <link> - attrcrossorigin - minVer: 18
+            firefox incompatible - @index.html#L186 - <details> - minVer: 49
+            ie incompatible - @index.html#L21 - <link> - attrcrossorigin not implemented
+            ie incompatible - @index.html#L21 - <link> - attrintegrity not implemented
+            ie incompatible - @index.html#L99 - <link> - attrcrossorigin not implemented
+            ie incompatible - @index.html#L117 - <header> - minVer: 9
+            ie incompatible - @index.html#L186 - <details> not implemented
+    CSS Report:
+            firefox incompatible - @test_files/style.css#L191 - Property: animation - minVer: 16
+            firefox incompatible - @test_files/style.css#L477 - Property: word-wrap - minVer: 49
+            firefox incompatible - @test_files/style.css#L485 - Property: font-variant-ligatures - minVer: 34
+            firefox incompatible - @test_files/style.css#L489 - Property: word-wrap - minVer: 49
+            firefox incompatible - @test_files/style.css#L491 - Property: word-break - minVer: 15
+            firefox incompatible - @test_files/style.css#L522 - Property: box-sizing - minVer: 29
+            firefox incompatible - @test_files/style.css#L686 - Property: box-sizing - minVer: 29
+            firefox incompatible - @test_files/style.css#L941 - Property: transform - minVer: 16
+            ie incompatible - @test_files/style.css#L49 - Property: background-color - minVer: 4
+            ie incompatible - @test_files/style.css#L54 - Property: background-color - minVer: 4
+            ie incompatible - @test_files/style.css#L58 - Property: content - minVer: 8
+            ie incompatible - @test_files/style.css#L62 - Property: font-weight - minVer: 3
+            …
+
 ## Limitations - Wishlist
 The following features are currently missing :'(
 
