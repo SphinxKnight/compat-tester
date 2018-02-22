@@ -8,7 +8,6 @@ const htmlAnalyzer = require("./bin/html/compat-analyzer");
 
 const scope = JSON.parse(fs.readFileSync(process.argv[3], "utf-8"));
 
-//var report = {"html":{},"css":{},"javascript":{}};
 
 // Let's parse the HTML
 htmlAnalyzer.analyzeFile(process.argv[2], scope, (e, d) => {
@@ -18,21 +17,29 @@ htmlAnalyzer.analyzeFile(process.argv[2], scope, (e, d) => {
     }
     let report = d;
     console.log("HTML Report:");
-    Object.keys(scope).map((browser) => {
-        console.log("\t" + browser + " is incompatible because of:");
-        Object.keys(report["html"]).map((elem) => {
-            Object.keys(report["html"][elem]).map((type) => {
-                Object.keys(report["html"][elem][type]).map((val) => {
-                    report["html"][elem][type][val].filter((e) => {
-                        return e.browser === browser;
-                    }).map((e) => {
-                        console.log("\t\t" + "<" + elem + ">" + " " + type + " " + val + " line: " + e.line + (e.feature_version ? " - minVer: " + e.feature_version : ""));
-                    });
-                });
-            });
-        });
+    // report =[ {"browser " / "filename" / "line" / "column" / "featureName" / "minVer"]
+    report.sort((a,b)=>{
+        if(a.browser !== b.browser){
+            return (a.browser).localeCompare(b.browser);
+        }
+        if(a.filename !== b.filename){
+            if(a.filename.split("/").length !== b.filename.split("/").length){
+                return (a.filename.split("/").length - b.filename.split("/").length);
+            }
+            return (a.filename).localeCompare(b.filename);
+        }
+        if(a.line !== b.line){
+            return a.line - b.line;
+        }
     });
+
+    report.map((elem)=>{
+        console.log("\t\t" + elem.browser + " incompatible - @" + elem.filename + "L" + elem.line + " - " + elem.featureName + (elem.featureVersion ? (" - minVer: " + elem.featureVersion) : " not implemented"));
+    });
+    // console.log("\t" + browser + " is incompatible because of:");
+    // console.log("\t\t" + "<" + elem + ">" + " " + type + " " + val + " line: " + e.line + (e.feature_version ? " - minVer: " + e.feature_version : ""));
 });
+
 
 // Let's get the CSS inside the site
 // cssExtracter.analyzeFile outputs an array of CSS stylesheet codes 
@@ -47,13 +54,15 @@ cssExtracter.analyzeFile(process.argv[2], (e, acc) => {
             console.log("CSS Report:");
             Object.keys(scope).map((browser) => {
                 console.log("\t" + browser + " is incompatible because of:");
-                Object.keys(report["css"]["properties"]).map((elem) => {
-                    report["css"]["properties"][elem].filter((e) => {
-                        return e.browser === browser;
-                    }).map((e) => {
-                        console.log("\t\t" + "<" + elem + ">" + " " + " line: " + e.line + (e.feature_version ? " - minVer: " + e.feature_version : ""));
+                if("properties" in report["css"]){
+                    Object.keys(report["css"]["properties"]).map((elem) => {
+                        report["css"]["properties"][elem].filter((e) => {
+                            return e.browser === browser;
+                        }).map((e) => {
+                            console.log("\t\t Property: " +  elem + "" + " " + " line: " + e.line + (e.feature_version ? " - minVer: " + e.feature_version : ""));
+                        });
                     });
-                });
+                }
             });
         });
     });
