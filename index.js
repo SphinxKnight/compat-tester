@@ -45,7 +45,7 @@ if(process.argv.length === 5){
     if(process.argv.includes("-css")){
         mode = "css";
         fileName = process.argv[process.argv.indexOf("-css") + 1];
-        scopeFileName = process.argv[Math.max(2((process.argv.indexOf("-css") + 2) % 5))];
+        scopeFileName = process.argv[Math.max(2,((process.argv.indexOf("-css") + 2) % 5))];
     }
     if(process.argv.includes("-js")){
         mode = "js";
