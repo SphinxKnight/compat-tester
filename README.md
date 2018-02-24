@@ -26,7 +26,6 @@ Thanks to them for doing the heavy work :)
     compat-tester # Scans index.html as root file and uses scope.json as defaults
     compat-tester mySite.html myScope.json
     compat-tester -html myPage.html myScope.json  # Only scans the HTML of myPage.html
-    compat-tester myScope.json -html myPage.html
     compat-tester -css myStyle.css myScope.json   # Only scans the CSS of myStyle.css
     compat-tester -js myScript.js myScope.json    # !Not implemented yet! Only scans myScript.js
 
@@ -84,7 +83,7 @@ Using an scope with IE "1" (not a typo ;)) and Firefox "8", the report might loo
 The following features are currently missing :'(
 
 ### CSS
-(*current feature set: properties*)
+(*current feature set: properties, @-rules*)
 * Media-queries
 * Selectors
 

@@ -10,7 +10,7 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
             if(node.property in bcd.css.properties){
                 Object.keys(browserScope).map((browser)=>{
                     const supportBrowser = bcd.css.properties[node.property].__compat.support[browser];
-                    let versionAddedProp ;
+                    let versionAddedProp;
                     if(Array.isArray(supportBrowser)){
                         // E.g. CSS property with prefixes
                         versionAddedProp = supportBrowser[0].version_added;
@@ -27,6 +27,30 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                             "line": node.loc.start.line + lineShift
                         });
                     }
+                });
+            }
+        }
+        if(node.type === "Atrule"){
+            if(node.name in bcd.css["at-rules"]){
+                Object.keys(browserScope).map((browser)=>{
+                    const supportBrowser = bcd.css["at-rules"][node.name].__compat.support[browser];
+                    let versionAddedAtRules;
+                    if(Array.isArray(supportBrowser)){
+                        versionAddedAtRules = supportBrowser[0].version_added;
+                    } else {
+                        versionAddedAtRules = supportBrowser.version_added;
+                    }
+                    if((!versionAddedAtRules) || (versionAddedAtRules !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAtRules)) )){
+                        report.push({
+                            "featureName": "@-rule: @" + node.name,
+                            "browser":browser,
+                            "fileName":fileName,
+                            "column": node.loc.start.column,
+                            "featureVersion": versionAddedAtRules,
+                            "line": node.loc.start.line + lineShift
+                        });
+                    }
+
                 });
             }
         }
