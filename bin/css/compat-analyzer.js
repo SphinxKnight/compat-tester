@@ -54,6 +54,30 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                 });
             }
         }
+        if(node.type === "MediaFeature"){
+            const mfName = node.name.replace(/^(min)|(max)-/,"");
+            if((mfName + "_media_feature") in bcd.css["at-rules"]["media"]){
+                Object.keys(browserScope).map((browser)=>{
+                    const supportBrowser = bcd.css["at-rules"]["media"][mfName + "_media_feature"].__compat.support[browser];
+                    let versionAddedMediaFeature;
+                    if(Array.isArray(supportBrowser)){
+                        versionAddedMediaFeature = supportBrowser[0].version_added;
+                    } else {
+                        versionAddedMediaFeature = supportBrowser.version_added;
+                    }
+                    if((!versionAddedMediaFeature) || (versionAddedMediaFeature !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedMediaFeature)) )){
+                        report.push({
+                            "featureName": "Media feature: @" + mfName,
+                            "browser":browser,
+                            "fileName":fileName,
+                            "column": node.loc.start.column,
+                            "featureVersion": versionAddedMediaFeature,
+                            "line": node.loc.start.line + lineShift
+                        });
+                    }
+                });
+            }
+        }
     });
     callback(null,report);
 };
