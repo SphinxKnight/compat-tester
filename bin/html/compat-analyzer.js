@@ -4,6 +4,19 @@ const fs = require("fs");
 const semver = require("semver");
 const readline = require("readline");
 
+// eslint-disable-next-line no-unused-vars
+exports.analyzeString = function analyzeString (str, browserScope, lineShift = 0, fileName, callback){
+    const report = [];
+    let numLine = 1;
+    const lines = str.split("\n");
+    const parser = initParser(browserScope, fileName, numLine, report, callback);
+    for(const line of lines){
+        parser.write(line);
+        numLine++;
+    }
+    parser.end();
+};
+
 exports.analyzeFile = function analyzeFile (fileName, browserScope, callback){
     const report = [];
     const rl = readline.createInterface({
@@ -12,7 +25,21 @@ exports.analyzeFile = function analyzeFile (fileName, browserScope, callback){
     });
     let numLine = 1;
 
-    const parser = new htmlParser.Parser({
+    const parser = initParser(browserScope, fileName, numLine, report, callback);
+
+    rl.on("line", (line) => {
+        parser.write(line);
+        numLine++;
+    });
+
+    rl.on("close",() =>{
+        parser.end();
+    });
+};
+
+
+function initParser (browserScope, fileName, numLine, report, callback){
+    return new htmlParser.Parser({
         onopentag: function (name, attribs){
             if(bcd.html.elements[name]){
                 Object.keys(browserScope).map((browser)=>{
@@ -52,14 +79,4 @@ exports.analyzeFile = function analyzeFile (fileName, browserScope, callback){
         }
     },{decodeEntities: true});
 
-
-    rl.on("line", (line) => {
-        parser.write(line);
-        numLine++;
-    });
-
-    rl.on("close",() =>{
-        parser.end();
-    });
-};
-
+}

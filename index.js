@@ -1,12 +1,13 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 const fs = require("fs");
 const path = require("path");
 const cssAnalyzer = require("./bin/css/compat-analyzer");
 const cssExtracter = require("./bin/css/css-extracter");
 const jsAnalyzer = require("./bin/js/compat-analyzer");
 const jsExtracter = require("./bin/js/js-extracter");
-
 const htmlAnalyzer = require("./bin/html/compat-analyzer");
+const {fetchURL} = require("./lib/fetchURL");
 
 // Deal with command line arguments
 
@@ -30,11 +31,21 @@ if(process.argv.length === 3 && path.extname(process.argv[2]) === ".js"){
     mode = "js";
     fileName = process.argv[2];
 }
+if(process.argv.length === 3 && process.argv[2].startsWith("http")){
+    mode = "url";
+    fileName = process.argv[2];
+}
 
-if(process.argv.length === 4){
+if(process.argv.length === 4 && process.argv[2].startsWith("http")){
+    mode = "url";
+    fileName = process.argv[2];
+    scopeFileName = process.argv[3];
+} else if(process.argv.length === 4){
     fileName = process.argv[2];
     scopeFileName = process.argv[3];
 }
+
+
 
 if(process.argv.length === 5){
     if(process.argv.includes("-html")){
@@ -58,7 +69,6 @@ if(process.argv.length === 5){
 const scope = JSON.parse(fs.readFileSync(scopeFileName, "utf-8"));
 
 if(mode === "normal"){
-
     // Let's parse the HTML
     htmlAnalyzer.analyzeFile(fileName, scope, (e, d) => {
         if (e) {
@@ -133,6 +143,7 @@ if(mode === "css"){
         report.map(printReportLine);
     });
 }
+
 if(mode === "js"){
     const content = fs.readFileSync(fileName,"utf-8");
     jsAnalyzer.analyzeString(content, scope, 0, fileName, (e, d) => {
@@ -146,6 +157,59 @@ if(mode === "js"){
         report.map(printReportLine);
     });
 }
+
+
+if(mode === "url"){
+    // Let's parse the HTML
+    fetchURL(fileName).then(str => {
+        htmlAnalyzer.analyzeString(str, scope, 0, fileName, (e, d) => {
+            if (e) {
+                console.error(e);
+                return false;
+            }
+            const report = d;
+            console.log("HTML Report:");
+            // report =[ {"browser " / "filename" / "line" / "column" / "featureName" / "minVer"]
+            report.sort(sortReport);
+            report.map(printReportLine);
+        });
+
+        // Let's get the CSS inside the site
+        cssExtracter.analyzeString(str, fileName, (e, acc) => {
+            acc.map(async (block) => {
+                cssAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
+                    if (e) {
+                        console.error(e);
+                        return false;
+                    }
+                    const report = d;
+                    console.log("CSS Report:");
+                    report.sort(sortReport);
+                    report.map(printReportLine);
+                });
+            });
+        });
+        // Let's get the JavaScript inside the site
+        jsExtracter.analyzeString(str, fileName, (e, acc) => {
+            acc.map(async (block) => {
+                jsAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
+                    if (e) {
+                        console.error(e);
+                        return false;
+                    }
+                    const report = d;
+                    // console.log("JS Report:");
+                    report.sort(sortReport);
+                    report.map(printReportLine);
+                });
+            });
+        });
+    }
+        ,(e)=>{console.error(e);});
+
+}
+
+
 
 function sortReport (reportLineA, reportLineB){
     if(reportLineA.browser !== reportLineB.browser){

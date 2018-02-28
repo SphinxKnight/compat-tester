@@ -25,6 +25,7 @@ Thanks to them for doing the heavy work :)
     
     compat-tester # Scans index.html as root file and uses scope.json as defaults
     compat-tester mySite.html myScope.json
+    compat-tester https://developer.mozilla.org/en-US/ myScope.json # Scans the remote web page
     compat-tester -html myPage.html myScope.json  # Only scans the HTML of myPage.html
     compat-tester -css myStyle.css myScope.json   # Only scans the CSS of myStyle.css
     compat-tester -js myScript.js myScope.json    # !Not implemented yet! Only scans myScript.js
@@ -84,7 +85,6 @@ The following features are currently missing :'(
 
 ### CSS
 (*current feature set: properties, @-rules*)
-* Media-queries
 * Selectors
 
 ### JavaScript
@@ -92,7 +92,7 @@ The following features are currently missing :'(
 * Parsing JS and dealing with primary features like statements, operators
 
 ### Misc.
-* Resolving remote resources
+* Resolving a tree of resources (e.g. fetch internal HTML pages, CSS with @import…)
 * Adding comments to locally disable warnings
 * An interactive CLI to easily create a `scope.json` file (something like "compat-tester --init")
 * Tests
