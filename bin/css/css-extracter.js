@@ -2,8 +2,9 @@ const fs = require("fs");
 const htmlParser = require("htmlparser2");
 const readline = require("readline");
 const path = require("path");
+const fetchURL = require("../../lib/fetchURL");
 
-exports.analyzeFile = function analyzeFile (fileName,callback){
+exports.analyzeFile = function (fileName,callback){
     const rl = readline.createInterface({
         input: fs.createReadStream(fileName),
         crlfDelay: Infinity
@@ -22,11 +23,16 @@ exports.analyzeFile = function analyzeFile (fileName,callback){
                 inStyle = true;
             }
             if(name === "link" && attribs.rel === "stylesheet"){
-                const fragment = {
-                    "fileName": path.relative(path.dirname(fileName),path.resolve(path.dirname(fileName),attribs.href)),
-                    "lineShift": 0,
-                    "content": fs.readFileSync(attribs.href,"utf-8")
-                };
+                const fragment = {};
+                fragment.lineShift = 0;
+                if(attribs.href.startsWith("http")){
+                    fragment.fileName = attribs.href;
+                    const content = fetchURL.fetchURL(attribs.href);
+                    fragment.content = content;
+                } else {
+                    fragment.fileName = path.relative(path.dirname(fileName),path.resolve(path.dirname(fileName),attribs.href));
+                    fragment.content = fs.readFileSync(attribs.href,"utf-8");
+                }
                 acc.push(fragment);
             }
         },

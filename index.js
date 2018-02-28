@@ -75,8 +75,8 @@ if(mode === "normal"){
 
     // Let's get the CSS inside the site
     cssExtracter.analyzeFile(fileName, (e, acc) => {
-        acc.map((block) => {
-            cssAnalyzer.analyzeString(block.content, scope, block.lineShift, block.fileName, (e, d) => {
+        acc.map(async (block) => {
+            cssAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
                 if (e) {
                     console.error(e);
                     return false;
@@ -92,8 +92,8 @@ if(mode === "normal"){
 
     // Let's get the JavaScript inside the site
     jsExtracter.analyzeFile(fileName, (e, acc) => {
-        acc.map((block) => {
-            jsAnalyzer.analyzeString(block.content, scope, block.lineShift, block.fileName, (e, d) => {
+        acc.map(async (block) => {
+            jsAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
                 if (e) {
                     console.error(e);
                     return false;
@@ -163,7 +163,7 @@ function sortReport (reportLineA, reportLineB){
 }
 
 function printReportLine (reportLine) {
-    console.log("\t\t" + reportLine.browser + " incompatible - @" + reportLine.fileName + "#L" + reportLine.line + " - " + reportLine.featureName + (reportLine.featureVersion ? (" - minVer: " + reportLine.featureVersion) : " not implemented"));
+    console.log(`\t\t${reportLine.browser} incompatible - ${reportLine.fileName}#L${reportLine.line} - ${reportLine.featureName} ${(reportLine.featureVersion ? (" - minVer: " + reportLine.featureVersion) : " not implemented")}`);
 }
 
 exports.htmlStringAnalyzer = function htmlStringAnalyzer (string, browserScope){
