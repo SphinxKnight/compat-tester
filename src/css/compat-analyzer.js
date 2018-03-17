@@ -2,7 +2,7 @@ const cssTree = require("css-tree");
 const bcd = require("mdn-browser-compat-data");
 const semver = require("semver");
 
-exports.analyzeString = function analyzeString (text, browserScope, lineShift = 0, fileName, callback){
+exports.analyzeString = function analyzeString (text, browserScope, lineShift = 0, fileName, callback, options){
     const report = [];
     const ast = cssTree.parse(text,{positions:true});
     cssTree.walk(ast,(node) => {
@@ -14,10 +14,10 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                     if(Array.isArray(supportBrowser)){
                         // E.g. CSS property with prefixes
                         versionAddedProp = supportBrowser[0].version_added;
-                    } else {
+                    } else if(supportBrowser) {
                         versionAddedProp = supportBrowser.version_added;
                     }
-                    if((!versionAddedProp) || (versionAddedProp !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedProp)) )){
+                    if((versionAddedProp !== null) && ((!versionAddedProp) || (versionAddedProp !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedProp)) ))){
                         report.push({
                             "featureName": "Property: " + node.property,
                             "browser":browser,
@@ -26,6 +26,14 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                             "featureVersion": versionAddedProp,
                             "line": node.loc.start.line + lineShift
                         });
+                    }
+                    if((options.contrib === "true" || options.contrib === "all" ) && versionAddedProp === true){
+                        // eslint-disable-next-line no-console
+                        console.log("CSS property " + node.property + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/css/properties/" + node.property + ".json to fix that 🤘");
+                    }
+                    if((options.contrib === "null" || options.contrib === "all" ) && versionAddedProp === null){
+                        // eslint-disable-next-line no-console
+                        console.log("CSS property " + node.property + " with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/css/properties/" + node.property + ".json to fix that 🤘");
                     }
                 });
             }
@@ -40,7 +48,7 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                     } else {
                         versionAddedAtRules = supportBrowser.version_added;
                     }
-                    if((!versionAddedAtRules) || (versionAddedAtRules !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAtRules)) )){
+                    if((versionAddedAtRules !== null) && ((!versionAddedAtRules) || (versionAddedAtRules !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAtRules)) ))){
                         report.push({
                             "featureName": "@-rule: @" + node.name,
                             "browser":browser,
@@ -50,7 +58,14 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                             "line": node.loc.start.line + lineShift
                         });
                     }
-
+                    if((options.contrib === "true" || options.contrib === "all" ) && versionAddedAtRules === true){
+                        // eslint-disable-next-line no-console
+                        console.log("CSS @-rule: @" + node.name + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/tree/master/css/at-rules/" + node.name + ".json to fix that 🤘");
+                    }
+                    if((options.contrib === "null" || options.contrib === "all" ) && versionAddedAtRules === null){
+                        // eslint-disable-next-line no-console
+                        console.log("CSS @-rule: @" + node.name + " with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/tree/master/css/at-rules/" + node.name + ".json to fix that 🤘");
+                    }
                 });
             }
         }
@@ -65,7 +80,7 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                     } else {
                         versionAddedMediaFeature = supportBrowser.version_added;
                     }
-                    if((!versionAddedMediaFeature) || (versionAddedMediaFeature !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedMediaFeature)) )){
+                    if((versionAddedMediaFeature !== null) && ((!versionAddedMediaFeature) || (versionAddedMediaFeature !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedMediaFeature)) ))){
                         report.push({
                             "featureName": "Media feature: @" + mfName,
                             "browser":browser,
@@ -74,6 +89,14 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                             "featureVersion": versionAddedMediaFeature,
                             "line": node.loc.start.line + lineShift
                         });
+                    }
+                    if((options.contrib === "true" || options.contrib === "all" ) && versionAddedMediaFeature === true){
+                        // eslint-disable-next-line no-console
+                        console.log("CSS Media feature: @" + mfName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/css/at-rules/media.json to fix that 🤘");
+                    }
+                    if((options.contrib === "null" || options.contrib === "all" ) && versionAddedMediaFeature === null){
+                        // eslint-disable-next-line no-console
+                        console.log("CSS Media feature: @" + mfName + " with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/css/at-rules/media.json to fix that 🤘");
                     }
                 });
             }

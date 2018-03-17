@@ -44,7 +44,7 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
             if(bcd.html.elements[name]){
                 Object.keys(browserScope).map((browser)=>{
                     const versionAddedElem = bcd.html.elements[name].__compat.support[browser].version_added;
-                    if((!versionAddedElem) || (versionAddedElem !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedElem)) )){
+                    if((versionAddedElem !== null) && ((!versionAddedElem) || (versionAddedElem !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedElem)) ))){
                         report.push({
                             "featureName":"<" + name + ">",
                             "browser":browser,
@@ -56,11 +56,11 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                     }
                     // Intercept any feature that isn't properly filled into MDN according to
                     // the contribute option
-                    if(options.contrib === "true" && versionAddedElem === true){
+                    if((options.contrib === "true" || options.contrib === "all" ) && versionAddedElem === true){
                         // eslint-disable-next-line no-console
                         console.log("Element <" + name + "> with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                     }
-                    if(options.contrib === "null" && versionAddedElem === null){
+                    if((options.contrib === "null" || options.contrib === "all" ) && versionAddedElem === null){
                         // eslint-disable-next-line no-console
                         console.log("Element <" + name + "> with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                     }
@@ -74,7 +74,7 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                             versionAddedAttr = bcd.html.global_attributes[attrib].__compat.support[browser].version_added;
                             featureName = "global attribute " + attrib;
                         }
-                        if(versionAddedAttr){
+                        if(versionAddedAttr !== undefined && versionAddedAttr !== null){
                             if((!versionAddedAttr) || (versionAddedAttr !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAttr)) )){
                                 report.push({
                                     "featureName":featureName,
@@ -86,7 +86,7 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                                 });
                             }
                         }
-                        if(options.contrib === "true" && versionAddedAttr === true){
+                        if((options.contrib === "true" || options.contrib === "all" ) && versionAddedAttr === true){
                             if(featureName.startsWith("global attribute")){
                                 // eslint-disable-next-line no-console
                                 console.log(featureName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/global_attributes.json to fix that 🤘");
@@ -95,7 +95,7 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                                 console.log(featureName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                             }
                         }
-                        if(options.contrib === "null" && versionAddedAttr === null){
+                        if((options.contrib === "null" || options.contrib === "all" ) && versionAddedAttr === null){
                             if(featureName.startsWith("global attribute")){
                                 // eslint-disable-next-line no-console
                                 console.log(featureName + " with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/global_attributes.json to fix that 🤘");
