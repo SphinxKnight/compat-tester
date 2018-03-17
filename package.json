@@ -24,7 +24,7 @@
   "dependencies": {
     "css-tree": "1.0.0-alpha.28",
     "htmlparser2": "^3.9.2",
-    "mdn-browser-compat-data": "^0.0.24",
+    "mdn-browser-compat-data": "^0.0.28",
     "semver": "^5.5.0"
   }
 }
