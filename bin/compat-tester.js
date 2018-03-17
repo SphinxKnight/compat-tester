@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 const fs = require("fs");
-const path = require("path");
+const commander = require("commander");
 const cssAnalyzer = require("./../src/css/compat-analyzer");
 const cssExtracter = require("./../src/css/css-extracter");
 const jsAnalyzer = require("./../src/js/compat-analyzer");
@@ -10,69 +10,43 @@ const htmlAnalyzer = require("./../src/html/compat-analyzer");
 const reportHelpers = require("./../lib/report");
 const {fetchURL} = require("./../lib/fetchURL");
 
-
 // Deal with command line arguments
+commander
+    .description("A command line tool to test HTML and CSS compatibility between a browser scope and a website")
+    .option("-url, --url [https://mysite.html]", "Scans the remote web page and fetches/scans associated resources (JS scripts / CSS stylesheets)")
+    .option("-file, --file [index.html]", "Scans the local file and fetches/scans associated resources", "index.html")
+    .option("-scope, --scope [scope.json]","The browser scope in a JSON format", "scope.json")
+    .option("-html, --html [myFile.html]", "Only scans the HTML of myFile.html")
+    .option("-css, --css [myFile.css]", "Only scans the CSS of myFile.css")
+    .parse(process.argv);
 
-let fileName = "index.html";
-let scopeFileName = "scope.json";
-let mode = "normal";
-if(process.argv.length === 2){
-    console.log("Using " + fileName + " as the root and " + scopeFileName + " as the scope descriptor");
-}
-if(process.argv.length === 3 && path.extname(process.argv[2]) === ".html"){
-    fileName = process.argv[2];
-}
-if(process.argv.length === 3 && path.extname(process.argv[2]) === ".json"){
-    scopeFileName = process.argv[2];
-}
-if(process.argv.length === 3 && path.extname(process.argv[2]) === ".css"){
-    mode = "css";
-    fileName = process.argv[2];
-}
-if(process.argv.length === 3 && path.extname(process.argv[2]) === ".js"){
-    mode = "js";
-    fileName = process.argv[2];
-}
-if(process.argv.length === 3 && process.argv[2].startsWith("http")){
-    mode = "url";
-    fileName = process.argv[2];
+// Exit gracefully, displaying help when no argument is given
+if(!process.argv.slice(2).length){
+    commander.outputHelp(str=>str);
+    process.exit();
 }
 
-if(process.argv.length === 4 && process.argv[2].startsWith("http")){
-    mode = "url";
-    fileName = process.argv[2];
-    scopeFileName = process.argv[3];
-} else if(process.argv.length === 4){
-    fileName = process.argv[2];
-    scopeFileName = process.argv[3];
-}
-
-
-
-if(process.argv.length === 5){
-    if(process.argv.includes("-html")){
-        mode = "html";
-        fileName = process.argv[process.argv.indexOf("-html") + 1];
-        scopeFileName = process.argv[Math.max(2,((process.argv.indexOf("-html") + 2) % 5))];
-    }
-    if(process.argv.includes("-css")){
-        mode = "css";
-        fileName = process.argv[process.argv.indexOf("-css") + 1];
-        scopeFileName = process.argv[Math.max(2,((process.argv.indexOf("-css") + 2) % 5))];
-    }
-    if(process.argv.includes("-js")){
-        mode = "js";
-        fileName = process.argv[process.argv.indexOf("-js") + 1];
-        scopeFileName = process.argv[Math.max(2,((process.argv.indexOf("-js") + 2) % 5))];
+// Coerce arguments to options
+// e.g. if >compat-tester mySite.html myScope.json
+// replace defaults
+if(commander.args.length > 0){
+    const testURL = commander.args.find(el => el.startsWith("http"));
+    const testCSS = commander.args.find(el => el.endsWith(".css"));
+    if(testURL){
+        commander.url = testURL;
+    } else if(testCSS){
+        commander.css = testCSS;
+    } else {
+        commander.scope = commander.args.find(el => el.endsWith(".json")) || "scope.json";
+        commander.file = commander.args.find(el => el.endsWith(".html")) || "index.html";
     }
 }
 
+const scope = JSON.parse(fs.readFileSync(commander.scope, "utf-8"));
 
-const scope = JSON.parse(fs.readFileSync(scopeFileName, "utf-8"));
-
-if(mode === "normal"){
+if(!commander.html && !commander.css && !commander.url){
     // Let's parse the HTML
-    htmlAnalyzer.analyzeFile(fileName, scope, (e, d) => {
+    htmlAnalyzer.analyzeFile(commander.file, scope, (e, d) => {
         if (e) {
             console.error(e);
             return false;
@@ -86,7 +60,7 @@ if(mode === "normal"){
 
 
     // Let's get the CSS inside the site
-    cssExtracter.analyzeFile(fileName, (e, acc) => {
+    cssExtracter.analyzeFile(commander.file, (e, acc) => {
         acc.map(async (block) => {
             cssAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
                 if (e) {
@@ -103,7 +77,7 @@ if(mode === "normal"){
 
 
     // Let's get the JavaScript inside the site
-    jsExtracter.analyzeFile(fileName, (e, acc) => {
+    jsExtracter.analyzeFile(commander.file, (e, acc) => {
         acc.map(async (block) => {
             jsAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
                 if (e) {
@@ -119,8 +93,8 @@ if(mode === "normal"){
     });
 }
 
-if(mode === "html"){
-    htmlAnalyzer.analyzeFile(fileName, scope, (e, d) => {
+if(commander.html){
+    htmlAnalyzer.analyzeFile(commander.html, scope, (e, d) => {
         if (e) {
             console.error(e);
             return false;
@@ -132,9 +106,9 @@ if(mode === "html"){
     });
 }
 
-if(mode === "css"){
-    const content = fs.readFileSync(fileName,"utf-8");
-    cssAnalyzer.analyzeString(content, scope, 0, fileName, (e, d) => {
+if(commander.css){
+    const content = fs.readFileSync(commander.css,"utf-8");
+    cssAnalyzer.analyzeString(content, scope, 0, commander.css, (e, d) => {
         if (e) {
             console.error(e);
             return false;
@@ -146,9 +120,9 @@ if(mode === "css"){
     });
 }
 
-if(mode === "js"){
-    const content = fs.readFileSync(fileName,"utf-8");
-    jsAnalyzer.analyzeString(content, scope, 0, fileName, (e, d) => {
+if(commander.js){
+    const content = fs.readFileSync(commander.js,"utf-8");
+    jsAnalyzer.analyzeString(content, scope, 0, commander.js, (e, d) => {
         if (e) {
             console.error(e);
             return false;
@@ -160,11 +134,10 @@ if(mode === "js"){
     });
 }
 
-
-if(mode === "url"){
+if(commander.url){
     // Let's parse the HTML
-    fetchURL(fileName).then(str => {
-        htmlAnalyzer.analyzeString(str, scope, 0, fileName, (e, d) => {
+    fetchURL(commander.url).then(str => {
+        htmlAnalyzer.analyzeString(str, scope, 0, commander.url, (e, d) => {
             if (e) {
                 console.error(e);
                 return false;
@@ -177,7 +150,7 @@ if(mode === "url"){
         });
 
         // Let's get the CSS inside the site
-        cssExtracter.analyzeString(str, fileName, (e, acc) => {
+        cssExtracter.analyzeString(str, commander.url, (e, acc) => {
             acc.map(async (block) => {
                 cssAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
                     if (e) {
@@ -192,7 +165,7 @@ if(mode === "url"){
             });
         });
         // Let's get the JavaScript inside the site
-        jsExtracter.analyzeString(str, fileName, (e, acc) => {
+        jsExtracter.analyzeString(str, commander.url, (e, acc) => {
             acc.map(async (block) => {
                 jsAnalyzer.analyzeString(await block.content, scope, block.lineShift, block.fileName, (e, d) => {
                     if (e) {
