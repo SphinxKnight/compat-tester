@@ -58,11 +58,11 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                     // the contribute option
                     if((options.contrib === "true" || options.contrib === "all" ) && versionAddedElem === true){
                         // eslint-disable-next-line no-console
-                        console.log("Element <" + name + "> with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
+                        console.log("HTML element <" + name + "> with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                     }
                     if((options.contrib === "null" || options.contrib === "all" ) && versionAddedElem === null){
                         // eslint-disable-next-line no-console
-                        console.log("Element <" + name + "> with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
+                        console.log("HTML element <" + name + "> with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                     }
                     Object.keys(attribs).map((attrib)=>{
                         let versionAddedAttr;
@@ -92,7 +92,7 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                                 console.log(featureName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/global_attributes.json to fix that 🤘");
                             } else {
                                 // eslint-disable-next-line no-console
-                                console.log(featureName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
+                                console.log("HTML " + featureName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                             }
                         }
                         if((options.contrib === "null" || options.contrib === "all" ) && versionAddedAttr === null){
@@ -101,7 +101,7 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                                 console.log(featureName + " with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/global_attributes.json to fix that 🤘");
                             } else {
                                 // eslint-disable-next-line no-console
-                                console.log(featureName + " with null in BCD for " + browser + " https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
+                                console.log("HTML " + featureName + " with null in BCD for " + browser + " https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                             }
                         }
                     });
