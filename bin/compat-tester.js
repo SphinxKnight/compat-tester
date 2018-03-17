@@ -2,11 +2,11 @@
 /* eslint-disable no-console */
 const fs = require("fs");
 const path = require("path");
-const cssAnalyzer = require("./src/css/compat-analyzer");
-const cssExtracter = require("./src/css/css-extracter");
-const jsAnalyzer = require("./src/js/compat-analyzer");
-const jsExtracter = require("./src/js/js-extracter");
-const htmlAnalyzer = require("./src/html/compat-analyzer");
+const cssAnalyzer = require("./../src/css/compat-analyzer");
+const cssExtracter = require("./../src/css/css-extracter");
+const jsAnalyzer = require("./../src/js/compat-analyzer");
+const jsExtracter = require("./../src/js/js-extracter");
+const htmlAnalyzer = require("./../src/html/compat-analyzer");
 const reportHelpers = require("./../lib/report");
 const {fetchURL} = require("./../lib/fetchURL");
 
