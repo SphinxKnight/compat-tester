@@ -6,7 +6,7 @@
   "scripts": {
     "test": "test"
   },
-  "bin": "./index.js",
+  "bin": "./bin/compat-tester.js",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/SphinxKnight/compat-tester.git"
