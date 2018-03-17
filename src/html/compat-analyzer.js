@@ -55,11 +55,19 @@ function initParser (browserScope, fileName, numLine, report, callback){
                         });
                     }
                     Object.keys(attribs).map((attrib)=>{
+                        let versionAddedAttr = null;
+                        let featureName = "";
                         if(bcd.html.elements[name][attrib] && bcd.html.elements[name][attrib].__compat){
-                            const versionAddedAttr = bcd.html.elements[name][attrib].__compat.support[browser].version_added;
+                            versionAddedAttr = bcd.html.elements[name][attrib].__compat.support[browser].version_added;
+                            featureName = "<" + name + "> - attribute " + attrib;
+                        } else if (bcd.html.global_attributes[attrib] && bcd.html.global_attributes[attrib].__compat){
+                            versionAddedAttr = bcd.html.global_attributes[attrib].__compat.support[browser].version_added;
+                            featureName = "global attribute " + attrib;
+                        }
+                        if(versionAddedAttr){
                             if((!versionAddedAttr) || (versionAddedAttr !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAttr)) )){
                                 report.push({
-                                    "featureName":"<" + name + "> - attr" + attrib,
+                                    "featureName":featureName,
                                     "browser":browser,
                                     "fileName":fileName,
                                     "line": numLine,
@@ -68,7 +76,6 @@ function initParser (browserScope, fileName, numLine, report, callback){
                                 });
                             }
                         }
-
                     });
                 });
 
