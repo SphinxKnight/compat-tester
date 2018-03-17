@@ -5,11 +5,11 @@ const semver = require("semver");
 const readline = require("readline");
 
 // eslint-disable-next-line no-unused-vars
-exports.analyzeString = function analyzeString (str, browserScope, lineShift = 0, fileName, callback){
+exports.analyzeString = function analyzeString (str, browserScope, lineShift = 0, fileName, callback, options){
     const report = [];
     let numLine = 1;
     const lines = str.split("\n");
-    const parser = initParser(browserScope, fileName, numLine, report, callback);
+    const parser = initParser(browserScope, fileName, numLine, report, callback, options);
     for(const line of lines){
         parser.write(line);
         numLine++;
@@ -17,7 +17,7 @@ exports.analyzeString = function analyzeString (str, browserScope, lineShift = 0
     parser.end();
 };
 
-exports.analyzeFile = function analyzeFile (fileName, browserScope, callback){
+exports.analyzeFile = function analyzeFile (fileName, browserScope, callback, options){
     const report = [];
     const rl = readline.createInterface({
         input: fs.createReadStream(fileName),
@@ -25,7 +25,7 @@ exports.analyzeFile = function analyzeFile (fileName, browserScope, callback){
     });
     let numLine = 1;
 
-    const parser = initParser(browserScope, fileName, numLine, report, callback);
+    const parser = initParser(browserScope, fileName, numLine, report, callback, options);
 
     rl.on("line", (line) => {
         parser.write(line);
@@ -38,7 +38,7 @@ exports.analyzeFile = function analyzeFile (fileName, browserScope, callback){
 };
 
 
-function initParser (browserScope, fileName, numLine, report, callback){
+function initParser (browserScope, fileName, numLine, report, callback, options){
     return new htmlParser.Parser({
         onopentag: function (name, attribs){
             if(bcd.html.elements[name]){
@@ -54,8 +54,18 @@ function initParser (browserScope, fileName, numLine, report, callback){
                             "featureVersion":versionAddedElem
                         });
                     }
+                    // Intercept any feature that isn't properly filled into MDN according to
+                    // the contribute option
+                    if(options.contrib === "true" && versionAddedElem === true){
+                        // eslint-disable-next-line no-console
+                        console.log("Element <" + name + "> with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
+                    }
+                    if(options.contrib === "null" && versionAddedElem === null){
+                        // eslint-disable-next-line no-console
+                        console.log("Element <" + name + "> with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
+                    }
                     Object.keys(attribs).map((attrib)=>{
-                        let versionAddedAttr = null;
+                        let versionAddedAttr;
                         let featureName = "";
                         if(bcd.html.elements[name][attrib] && bcd.html.elements[name][attrib].__compat){
                             versionAddedAttr = bcd.html.elements[name][attrib].__compat.support[browser].version_added;
@@ -74,6 +84,24 @@ function initParser (browserScope, fileName, numLine, report, callback){
                                     "column": 0,
                                     "featureVersion":versionAddedAttr
                                 });
+                            }
+                        }
+                        if(options.contrib === "true" && versionAddedAttr === true){
+                            if(featureName.startsWith("global attribute")){
+                                // eslint-disable-next-line no-console
+                                console.log(featureName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/global_attributes.json to fix that 🤘");
+                            } else {
+                                // eslint-disable-next-line no-console
+                                console.log(featureName + " with true in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
+                            }
+                        }
+                        if(options.contrib === "null" && versionAddedAttr === null){
+                            if(featureName.startsWith("global attribute")){
+                                // eslint-disable-next-line no-console
+                                console.log(featureName + " with null in BCD for " + browser + ": https://github.com/mdn/browser-compat-data/blob/master/html/global_attributes.json to fix that 🤘");
+                            } else {
+                                // eslint-disable-next-line no-console
+                                console.log(featureName + " with null in BCD for " + browser + " https://github.com/mdn/browser-compat-data/blob/master/html/elements/" + name + ".json to fix that 🤘");
                             }
                         }
                     });

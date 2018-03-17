@@ -15,11 +15,11 @@ commander
     .description("A command line tool to test HTML and CSS compatibility between a browser scope and a website")
     .option("-url, --url [https://mysite.html]", "Scans the remote web page and fetches/scans associated resources (JS scripts / CSS stylesheets)")
     .option("-file, --file [index.html]", "Scans the local file and fetches/scans associated resources", "index.html")
+    .option("-contrib, --contribute [null|true|all]","Contribution mode to help fill data that isn't known into MDN browser-compat dataset. `null` addresses known features with unknown compatibility values and `true` addresses know features which are known to be compatible but without any detail","null")
     .option("-scope, --scope [scope.json]","The browser scope in a JSON format", "scope.json")
     .option("-html, --html [myFile.html]", "Only scans the HTML of myFile.html")
     .option("-css, --css [myFile.css]", "Only scans the CSS of myFile.css")
     .parse(process.argv);
-
 // Exit gracefully, displaying help when no argument is given
 if(!process.argv.slice(2).length){
     commander.outputHelp(str=>str);
@@ -42,6 +42,12 @@ if(commander.args.length > 0){
     }
 }
 
+// Convert different options into an object
+const options = {
+    "contrib": commander.contribute
+    // Might add other secondary options to this
+};
+
 const scope = JSON.parse(fs.readFileSync(commander.scope, "utf-8"));
 
 if(!commander.html && !commander.css && !commander.url){
@@ -56,7 +62,7 @@ if(!commander.html && !commander.css && !commander.url){
         // report =[ {"browser " / "filename" / "line" / "column" / "featureName" / "minVer"]
         report.sort(reportHelpers.sortReport);
         report.map(reportHelpers.printReportLine);
-    });
+    }, options);
 
 
     // Let's get the CSS inside the site
@@ -71,7 +77,7 @@ if(!commander.html && !commander.css && !commander.url){
                 console.log("CSS Report:");
                 report.sort(reportHelpers.sortReport);
                 report.map(reportHelpers.printReportLine);
-            });
+            }, options);
         });
     });
 
@@ -88,7 +94,7 @@ if(!commander.html && !commander.css && !commander.url){
                 // console.log("JS Report:");
                 report.sort(reportHelpers.sortReport);
                 report.map(reportHelpers.printReportLine);
-            });
+            }, options);
         });
     });
 }
@@ -103,7 +109,7 @@ if(commander.html){
         console.log("HTML Report:");
         report.sort(reportHelpers.sortReport);
         report.map(reportHelpers.printReportLine);
-    });
+    }, options);
 }
 
 if(commander.css){
@@ -117,7 +123,7 @@ if(commander.css){
         console.log("CSS Report:");
         report.sort(reportHelpers.sortReport);
         report.map(reportHelpers.printReportLine);
-    });
+    }, options);
 }
 
 if(commander.js){
@@ -131,7 +137,7 @@ if(commander.js){
         console.log("JavaScript analysis isn't yet implemented - JS Report:");
         report.sort(reportHelpers.sortReport);
         report.map(reportHelpers.printReportLine);
-    });
+    }, options);
 }
 
 if(commander.url){
@@ -147,7 +153,7 @@ if(commander.url){
             // report =[ {"browser " / "filename" / "line" / "column" / "featureName" / "minVer"]
             report.sort(reportHelpers.sortReport);
             report.map(reportHelpers.printReportLine);
-        });
+        }, options);
 
         // Let's get the CSS inside the site
         cssExtracter.analyzeString(str, commander.url, (e, acc) => {
@@ -161,7 +167,7 @@ if(commander.url){
                     console.log("CSS Report:");
                     report.sort(reportHelpers.sortReport);
                     report.map(reportHelpers.printReportLine);
-                });
+                }, options);
             });
         });
         // Let's get the JavaScript inside the site
@@ -176,7 +182,7 @@ if(commander.url){
                     // console.log("JS Report:");
                     report.sort(reportHelpers.sortReport);
                     report.map(reportHelpers.printReportLine);
-                });
+                }, options);
             });
         });
     }
