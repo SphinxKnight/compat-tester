@@ -45,7 +45,7 @@ exports.analyzeString = function analyzeString (text, browserScope, lineShift = 
                     let versionAddedAtRules;
                     if(Array.isArray(supportBrowser)){
                         versionAddedAtRules = supportBrowser[0].version_added;
-                    } else {
+                    } else if(supportBrowser) {
                         versionAddedAtRules = supportBrowser.version_added;
                     }
                     if((versionAddedAtRules !== null) && ((!versionAddedAtRules) || (versionAddedAtRules !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedAtRules)) ))){

@@ -43,7 +43,10 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
         onopentag: function (name, attribs){
             if(bcd.html.elements[name]){
                 Object.keys(browserScope).map((browser)=>{
-                    const versionAddedElem = bcd.html.elements[name].__compat.support[browser].version_added;
+                    let versionAddedElem;
+                    if(bcd.html.elements[name].__compat.support[browser]){
+                        versionAddedElem = bcd.html.elements[name].__compat.support[browser].version_added;
+                    }
                     if((versionAddedElem !== null) && ((!versionAddedElem) || (versionAddedElem !== true && semver.lt(semver.coerce(browserScope[browser]), semver.coerce(versionAddedElem)) ))){
                         report.push({
                             "featureName":"<" + name + ">",
@@ -67,10 +70,10 @@ function initParser (browserScope, fileName, numLine, report, callback, options)
                     Object.keys(attribs).map((attrib)=>{
                         let versionAddedAttr;
                         let featureName = "";
-                        if(bcd.html.elements[name][attrib] && bcd.html.elements[name][attrib].__compat){
+                        if(bcd.html.elements[name][attrib] && bcd.html.elements[name][attrib].__compat && bcd.html.elements[name][attrib].__compat.support[browser]){
                             versionAddedAttr = bcd.html.elements[name][attrib].__compat.support[browser].version_added;
                             featureName = "<" + name + "> - attribute " + attrib;
-                        } else if (bcd.html.global_attributes[attrib] && bcd.html.global_attributes[attrib].__compat){
+                        } else if (bcd.html.global_attributes[attrib] && bcd.html.global_attributes[attrib].__compat && bcd.html.global_attributes[attrib].__compat.support[browser]){
                             versionAddedAttr = bcd.html.global_attributes[attrib].__compat.support[browser].version_added;
                             featureName = "global attribute " + attrib;
                         }

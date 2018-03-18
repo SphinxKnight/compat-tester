@@ -15,7 +15,7 @@ commander
     .description("A command line tool to test HTML and CSS compatibility between a browser scope and a website")
     .option("-url, --url [https://mysite.html]", "Scans the remote web page and fetches/scans associated resources (JS scripts / CSS stylesheets)")
     .option("-file, --file [index.html]", "Scans the local file and fetches/scans associated resources", "index.html")
-    .option("-contrib, --contribute [null|true|all]","Contribution mode to help fill data that isn't known into MDN browser-compat dataset. `null` addresses known features with unknown compatibility values and `true` addresses know features which are known to be compatible but without any detail; `all` lists both","null")
+    .option("-contrib, --contribute [null|true|all]","Contribution mode to help fill data that isn't known into MDN browser-compat dataset. `null` addresses known features with unknown compatibility values and `true` addresses know features which are known to be compatible but without any detail; `all` lists both")
     .option("-scope, --scope [scope.json]","The browser scope in a JSON format", "scope.json")
     .option("-html, --html [myFile.html]", "Only scans the HTML of myFile.html")
     .option("-css, --css [myFile.css]", "Only scans the CSS of myFile.css")
