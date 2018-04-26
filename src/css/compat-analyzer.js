@@ -2,7 +2,7 @@ const cssTree = require("css-tree");
 const bcd = require("mdn-browser-compat-data");
 const semver = require("semver");
 
-exports.analyzeString = function analyzeString (text, browserScope, lineShift = 0, fileName, callback, options){
+exports.analyzeString = function analyzeString (text, browserScope, lineShift = 0, fileName, callback, options = {"contrib":null}){
     const report = [];
     const ast = cssTree.parse(text,{positions:true});
     cssTree.walk(ast,(node) => {

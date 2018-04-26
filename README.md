@@ -32,7 +32,7 @@ Thanks to them for doing the heavy work :)
 
 ### As a module 
 
-    const compatTester = require(compat-tester);
+    const compatTester = require("compat-tester");
     let report = compatTester.cssStringAnalyzer(string, browserScope);
     let report = compatTester.cssFileAnalyzer(filePath, browserScope);
     let report = compatTester.htmlStringAnalyzer(string, browserScope);

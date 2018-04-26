@@ -38,7 +38,7 @@ exports.analyzeFile = function analyzeFile (fileName, browserScope, callback, op
 };
 
 
-function initParser (browserScope, fileName, numLine, report, callback, options){
+function initParser (browserScope, fileName, numLine, report, callback, options = {"contrib":null}){
     return new htmlParser.Parser({
         onopentag: function (name, attribs){
             if(bcd.html.elements[name]){
