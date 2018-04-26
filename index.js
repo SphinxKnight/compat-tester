@@ -8,59 +8,51 @@ const htmlAnalyzer = require("./src/html/compat-analyzer");
 const reportHelpers = require("./lib/report");
 
 // Exports API
-exports.htmlStringAnalyzer = function htmlStringAnalyzer (string, browserScope, options){
+exports.htmlStringAnalyzer = function htmlStringAnalyzer (string, browserScope, cbReport, options){
     htmlAnalyzer.analyzeString(string, browserScope, 0, "HTMLString", (e, d) => {
         if (e) {
             console.error(e);
             return false;
         }
         const report = d;
-        console.log("HTML Report:");
-        report.sort(reportHelpers.sortReport);
-        report.map(reportHelpers.printReportLine);
+        cbReport(report);
     }, options);
 };
 
-exports.cssStringAnalyzer = function cssStringAnalyzer (string, browserScope, options){
+exports.cssStringAnalyzer = function cssStringAnalyzer (string, browserScope, cbReport, options){
     cssAnalyzer.analyzeString(string, browserScope, 0, "CSSString", (e, d) => {
         if (e) {
             console.error(e);
             return false;
         }
         const report = d;
-        console.log("CSS Report:");
-        report.sort(reportHelpers.sortReport);
-        report.map(reportHelpers.printReportLine);
+        cbReport(report);
     }, options);
 };
 
-exports.jsStringAnalyzer = function jsStringAnalyzer (string, browserScope, options){
+exports.jsStringAnalyzer = function jsStringAnalyzer (string, browserScope, cbReport, options){
     jsAnalyzer.analyzeString(string, browserScope, 0, "JSString", (e, d) => {
         if (e) {
             console.error(e);
             return false;
         }
         const report = d;
-        console.log("JS Report:");
-        report.sort(reportHelpers.sortReport);
-        report.map(reportHelpers.printReportLine);
+        cbReport(report);
     }, options);
 };
 
-exports.htmlFileAnalyzer = function htmlFileAnalyzer (filePath, browserScope, options){
+exports.htmlFileAnalyzer = function htmlFileAnalyzer (filePath, browserScope, cbReport, options){
     htmlAnalyzer.analyzeFile(filePath, browserScope, (e, d) => {
         if (e) {
             console.error(e);
             return false;
         }
         const report = d;
-        console.log("HTML Report:");
-        report.sort(reportHelpers.sortReport);
-        report.map(reportHelpers.printReportLine);
+        cbReport(report);
     }, options);
 };
 
-exports.cssFileAnalyzer = function cssFileAnalyzer (filePath, browserScope, options){
+exports.cssFileAnalyzer = function cssFileAnalyzer (filePath, browserScope, cbReport, options){
     const content = fs.readFileSync(filePath,"utf-8");
     cssAnalyzer.analyzeString(content, browserScope, 0, path.basename(filePath), (e, d) => {
         if (e) {
@@ -68,13 +60,11 @@ exports.cssFileAnalyzer = function cssFileAnalyzer (filePath, browserScope, opti
             return false;
         }
         const report = d;
-        console.log("CSS Report:");
-        report.sort(reportHelpers.sortReport);
-        report.map(reportHelpers.printReportLine);
+        cbReport(report);
     }, options);
 };
 
-exports.jsFileAnalyzer = function jsFileAnalyzer (filePath, browserScope, options){
+exports.jsFileAnalyzer = function jsFileAnalyzer (filePath, browserScope, cbReport, options){
     const content = fs.readFileSync(filePath,"utf-8");
     jsAnalyzer.analyzeString(content, browserScope, 0, path.basename(filePath), (e, d) => {
         if (e) {
@@ -82,8 +72,6 @@ exports.jsFileAnalyzer = function jsFileAnalyzer (filePath, browserScope, option
             return false;
         }
         const report = d;
-        console.log("JavaScript analysis isn't yet implemented - JS Report:");
-        report.sort(reportHelpers.sortReport);
-        report.map(reportHelpers.printReportLine);
+        cbReport(report);
     }, options);
 };

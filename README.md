@@ -34,12 +34,12 @@ Thanks to them for doing the heavy work :)
 
     const compatTester = require("compat-tester");
     const options = {"contrib": "all"} // "all"|"true"|"null"
-    let report = compatTester.cssStringAnalyzer(string, browserScope[, options ]);
-    let report = compatTester.cssFileAnalyzer(filePath, browserScope[, options ]);
-    let report = compatTester.htmlStringAnalyzer(string, browserScope[, options ]);
-    let report = compatTester.htmlFileAnalyzer(filePath, browserScope[, options ]);
-    let report = compatTester.jsStringAnalyzer(string, browserScope[, options ]); // Not implemented yet
-    let report = compatTester.jsFileAnalyzer(filePath, browserScope[, options ]); // Not implemented yet
+    let report = compatTester.cssStringAnalyzer(string, browserScope, callback[, options ]);
+    let report = compatTester.cssFileAnalyzer(filePath, browserScope, callback[, options ]);
+    let report = compatTester.htmlStringAnalyzer(string, browserScope, callback[, options ]);
+    let report = compatTester.htmlFileAnalyzer(filePath, browserScope, callback[, options ]);
+    let report = compatTester.jsStringAnalyzer(string, browserScope, callback[, options ]); // Not implemented yet
+    let report = compatTester.jsFileAnalyzer(filePath, browserScope, callback[, options ]); // Not implemented yet
 
 ## Browser-scope file
 
