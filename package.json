@@ -1,6 +1,6 @@
 {
   "name": "compat-tester",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Diagnose the compatibility of a site regarding browsers and environments",
   "main": "index.js",
   "scripts": {
